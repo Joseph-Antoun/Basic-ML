@@ -1,6 +1,4 @@
-import math
 import numpy as np
-from random import random
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -10,19 +8,32 @@ import data_cleaning
 
 class LogisticRegression:
 
-    def __init__(self, X, y, x_labels, y_label, alpha=1, num_iters=100, stopping_criteria = 10e-2):
-        self.n, self.m = np.shape(X) # Here we might want to add an extra column filled with ones to X for the intercept ?
+    def __init__(self, X, y, x_labels, y_label, alpha=1, num_iters=100, stopping_criteria=10e-2, ratio=[80.0, 10.0, 10.0]):
+        self.n, self.m = np.shape(X)
+        """ 
+        Here we might want to add an extra column filled with ones to X for the intercept ?
+        """
         self.X = X 
         self.y = y
 
         self.x_labels = x_labels,
         self.y_label  = y_label,
 
-        self.w = np.random.rand(self.m, 1) # random weights initialization
+        self.w = np.random.rand(self.m, 1)  # random weights initialization
         self.num_iters = num_iters
         self.alpha = alpha
         self.epsilon = stopping_criteria
+        self.w_learned = np.ones()
 
+        self.split_ratio = ratio
+        self.tr_x = np.ones()
+        self.tr_y = np.ones()
+        self.vl_x = np.ones()
+        self.vl_y = np.ones()
+        self.ts_x = np.ones()
+        self.ts_y = np.ones()
+
+        self.split_data()
 
     def __repr__(self):
         """
@@ -40,7 +51,7 @@ class LogisticRegression:
         y_label     = %s
         X = %s,
         y = %s
-        """ % ( self.n, self.m, self.w, self.num_iters, self.alpha, self.epsilon, 
+        """ % (self.n, self.m, self.w, self.num_iters, self.alpha, self.epsilon,
                 self.x_labels, self.y_label, self.X, self.y)
         return str_
 
@@ -74,11 +85,11 @@ class LogisticRegression:
             stop = abs(w - w_init)
             w_init = w
 
-        Glob.w_init = w_init
+        self.w_learned = w_init
 
     def predict(self, t_data):
         x = t_data.x
-        w = Glob.w_init
+        w = self.w_learned
         z = np.matmul(np.transpose(w), np.transpose(x))
         p = self.sigmoid(z)
         predicted_y = np.around(p)
@@ -91,6 +102,19 @@ class LogisticRegression:
 
         acc = (1 - (np.sum(abs(y - predicted_y)) / len(np.transpose(y)))) * 100
 
+        return acc
+
+    def split_data(self):
+        n = self.n
+        tr_ind = int((self.split_ratio[0]*n) / 100)
+        vl_ind = int((self.split_ratio[1]*n) / 100)
+        ts_ind = int((self.split_ratio[2]*n) / 100)
+        self.tr_x = self.X[0:tr_ind, :]
+        self.tr_y = self.y[0:tr_ind, :]
+        self.vl_x = self.X[tr_ind:vl_ind, :]
+        self.vl_y = self.y[tr_ind:vl_ind, :]
+        self.ts_x = self.X[vl_ind:ts_ind, :]
+        self.ts_y = self.y[vl_ind:ts_ind, :]
 
 
 def dataframe_to_narray(df, x_vars, y_var):
