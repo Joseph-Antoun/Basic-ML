@@ -68,7 +68,7 @@ class LogisticRegression:
             w = w_init + alpha * np.inner(np.transpose(x), q)
             stop = np.linalg.norm(np.subtract(w, w_init), 2)
             w_init = w
-            i+=1
+            i += 1
 
         self.w_learned = w_init
 

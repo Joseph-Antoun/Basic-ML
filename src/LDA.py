@@ -57,7 +57,7 @@ class LDA:
         d[d <= 0] = 0
         d[d > 0] = 1
 
-        return d
+        return np.transpose(d)
 
     # def evaluate_acc(self, ev_x, ev_y):
     #     x = ev_x

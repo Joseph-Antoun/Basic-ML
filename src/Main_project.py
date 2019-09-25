@@ -1,17 +1,18 @@
 import numpy as np
 import pandas as pd
+from datetime import datetime
 
 import data_cleaning as dc
 import LDA as lda
 import Pr1 as logR
 
+
 def evaluate_acc(ts_x, ts_y, model):
     x = ts_x
     y = ts_y
     predicted_y = model.predict(x)
-
     err = (np.sum(abs(y - predicted_y)) / len(np.transpose(y)))
-    acc = (1 - err)*100
+    acc = (1 - err)
 
     return err, acc
 
@@ -63,6 +64,8 @@ def model_selection(ev_x, ev_y, model, k=1):
 
 
 def main():
+    start_time = datetime.now()
+
     file_path = '../data/wine/winequality-red.csv'
     raw_data = pd.read_csv(file_path, delimiter=';')
     clean_data = dc.get_clean_data(raw_data)
@@ -78,7 +81,7 @@ def main():
     # Split between X and y and create the numpy arrays
     y_var = 'y'
     x_vars = [var for var in clean_data.columns.tolist() if not var in y_var]
-    X_train, y_train, X_test, y_test = dc.train_test_split(clean_data, x_vars, y_var)
+    X_train, X_test, y_train, y_test = dc.train_test_split(clean_data, x_vars, y_var)
 
     np.seterr(over='ignore')
 
@@ -95,6 +98,7 @@ def main():
     print(ld_avg_err)
     print(ld_avg_acc)
 
+    print("Time lapsed = ", datetime.now() - start_time)
 
 if __name__ == "__main__":
     main()
