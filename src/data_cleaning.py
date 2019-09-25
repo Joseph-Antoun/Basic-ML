@@ -125,7 +125,6 @@ def train_test_split(df, x_vars, y_var, train_ratio=0.8, shuffle=True, random_se
     # The do the train-test split on the shuffled dataframe
     nrows_tot   = len(df.index)
     split_idx   = int(train_ratio * nrows_tot)
-    print("Total number of rows = %s, train ratio = %s (=%s rows)" % (nrows_tot, train_ratio, split_idx))
 
     train_df    = df[:split_idx]
     test_df     = df[split_idx:]
@@ -136,7 +135,7 @@ def train_test_split(df, x_vars, y_var, train_ratio=0.8, shuffle=True, random_se
     X_test  = test_df[x_vars].to_numpy()
     y_test  = test_df[y_var].to_numpy()
 
-    return X_train, y_train, X_test, y_test
+    return X_train, X_test, y_train, y_test
 
 
 
@@ -157,7 +156,7 @@ def main():
     # Split between X and y and create the numpy arrays
     y_var  = 'y'
     x_vars = [var for var in clean_data.columns.tolist() if not var in y_var]
-    X_train, y_train, X_test, y_test = train_test_split(clean_data, x_vars, y_var)
+    X_train, X_test, y_train, y_test = train_test_split(clean_data, x_vars, y_var)
 
 
 if __name__ == "__main__":
