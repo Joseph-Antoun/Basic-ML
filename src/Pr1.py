@@ -1,9 +1,4 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
-# Use the clean_data module (in the same folder) to load the data
-import data_cleaning
 
 
 class LogisticRegression:
@@ -23,7 +18,7 @@ class LogisticRegression:
         self.num_iters = num_iters
         self.alpha = alpha
         self.epsilon = stopping_criteria
-        self.w_learned = np.ones()
+        self.w_learned = np.ones((self.m, 1))
 
     def __repr__(self):
         """
@@ -53,27 +48,27 @@ class LogisticRegression:
         :param t: w^t.x_i
         :return: sigmoid(t)
         """
-
         sig = 1/(1+np.exp(-t))
         return sig
 
-    def fit(self, X, y, n_iters):
+    def fit(self, X, y):
 
         x = X  # this should get the features matrix without the results y
         y = y  # This should get the results of  trained features
         alpha = self.alpha
-        n, m = np.shape(data)
-        w_init = np.random.random(m, 1)
+        n, m = np.shape(X)
+        w_init = np.random.random((m, 1))
         epsilon = self.epsilon
         stop = 1
         i = 0
 
-        while i <= n_iters and stop > epsilon:
+        while i <= self.num_iters and stop > epsilon:
             z = np.matmul(np.transpose(w_init), np.transpose(x))  # calculating the inner input for the sigmoid
             q = np.transpose(y) - self.sigmoid(z)
             w = w_init + alpha * np.inner(np.transpose(x), q)
-            stop = abs(w - w_init)
+            stop = np.linalg.norm(np.subtract(w, w_init), 2)
             w_init = w
+            i+=1
 
         self.w_learned = w_init
 
