@@ -110,13 +110,54 @@ def get_clean_data(raw_data, delete_outliers=False, verbose=True):
     return clean_data.drop('flag', axis=1)
 
 
+
+def train_test_split(df, x_vars, y_var, train_ratio=0.8, shuffle=True, random_seed=42):
+    """
+    Takes a pandas dataframe (output from the data cleaning step)
+    and returns the following numpy arrays
+    X_train, y_train, X_test, y_test
+    """
+    np.random.seed(random_seed)
+
+    # Shuffle dataframe first
+    df = df.sample(frac=1)
+
+    # The do the train-test split on the shuffled dataframe
+    nrows_tot   = len(df.index)
+    split_idx   = int(train_ratio * nrows_tot)
+    print("Total number of rows = %s, train ratio = %s (=%s rows)" % (nrows_tot, train_ratio, split_idx))
+
+    train_df    = df[:split_idx]
+    test_df     = df[split_idx:]
+
+    # Return the desired numpy arrays
+    X_train = train_df[x_vars].to_numpy()
+    y_train = train_df[y_var].to_numpy()
+    X_test  = test_df[x_vars].to_numpy()
+    y_test  = test_df[y_var].to_numpy()
+
+    return X_train, y_train, X_test, y_test
+
+
+
 def main():
     
     file_path   = '../data/wine/winequality-red.csv'
     raw_data    = pd.read_csv(file_path, delimiter=';')
     clean_data  = get_clean_data(raw_data)
 
-    print(clean_data)
+    # this is to skip SettingWithCopyWarning from Pandas
+    clean_df   = get_clean_data(raw_data, verbose=False)
+    clean_data = clean_df.copy()
+    # Create the binary y column
+    clean_data['y'] = np.where(clean_df['quality'] >= 6.0, 1.0, 0.0)
+    # Drop the 'quality' column as it shouldn't be used to predict the wine binary rating
+    clean_data.drop('quality', axis=1, inplace=True)
+
+    # Split between X and y and create the numpy arrays
+    y_var  = 'y'
+    x_vars = [var for var in clean_data.columns.tolist() if not var in y_var]
+    X_train, y_train, X_test, y_test = train_test_split(clean_data, x_vars, y_var)
 
 
 if __name__ == "__main__":
