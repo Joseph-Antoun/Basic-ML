@@ -5,7 +5,7 @@ import pandas as pd
 def evaluate_acc(ts_x, ts_y, model):
     x = ts_x
     y = ts_y
-    predicted_y = model.predict(y)
+    predicted_y = model.predict(x)
 
     err = (np.sum(abs(y - predicted_y)) / len(np.transpose(y)))
     acc = (1 - err)*100
@@ -43,9 +43,10 @@ def model_selection(ev_x, ev_y, model, k=1):
             y_vl = y[i]
             del(temp_x[i])
             del(temp_y[i])
-            x_tr = np.concatenate(temp_x)
+            x_tr1 = np.concatenate(temp_x)
             y_tr = np.concatenate(temp_y)
-
+            n, m = np.shape(x_tr1)
+            x_tr = np.concatenate(np.ones(n, 1), x_tr1)
             model.fit(x_tr, y_tr)
             err, acc = evaluate_acc(x_vl, y_vl, model)
             tot_err.append(err)
