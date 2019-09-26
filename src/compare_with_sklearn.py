@@ -4,10 +4,12 @@ import pandas as pd
 import sys
 
 # Sklearn functions for validation purposes
-from sklearn.model_selection import train_test_split as sklearn_train_test_split
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as Sklean_LDA
 
 # Import custom data cleaning module
 import data_cleaning
+import data_visualization
+import LDA as Custom_LDA
 
 
 
@@ -23,32 +25,7 @@ def compute_y_column_wine(clean_data):
     # Drop the 'quality' column
     return clean_df.drop('quality', axis=1)
 
-
-def validate_train_test_split(clean_data, x_vars, y_var):
-    """
-    Validates our custom train_test_split function against the
-    one from sklearn
-    """
-    X_train,X_test,y_train,y_test = data_cleaning.train_test_split(
-        clean_data, 
-        x_vars, y_var,
-        train_ratio=0.8,
-        random_seed=42)
-
-    # Sklearn's function required a numpy array
-    X = clean_data[x_vars].to_numpy()
-    y = clean_data[y_var].to_numpy()
-
-    X_train_sk,X_test_sk,y_train_sk,y_test_sk = sklearn_train_test_split(
-        X, y, train_size=0.8, random_state=42)
-
-    print("custom X_train")
-    print(X_train)
-    print("sklearn X_train")
-    print(X_train_sk)
-    print(X_train.shape)
-    print(X_train_sk.shape)
-
+        
 
 def main():
 
@@ -73,8 +50,25 @@ def main():
             x_vars,
             y_var,
             random_seed=42)
-    # Validate our custom function
-    validate_train_test_split(clean_data, x_vars, y_var) 
+
+    #--------------------------------------------------------------------------
+    # LDA
+    #--------------------------------------------------------------------------
+    # Sklearn version of LDA
+    sklearn_lda = Sklean_LDA()
+    sklearn_lda.fit(X_train, y_train)
+    sklearn_pred = sklearn_lda.predict(X_test)
+
+    # Custom version of LDA
+    custom_lda = Custom_LDA.LDA(X_train, y_train)
+    custom_lda.fit(X_train, y_train)
+    custom_pred = custom_lda.predict(X_test)
+
+    data_visualization.plot_predictions_results(
+            sklearn_lda,
+            X_test, y_test, 
+            custom_pred, sklearn_pred, 
+            "lda_predictions.png")    
 
 
 

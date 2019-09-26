@@ -104,6 +104,62 @@ def data_analysis_plots(clean_data, x_vars, y_vars):
     draw_correlations(clean_data[x_vars + ['y']], "correlations")
    
 
+
+def plot_predictions_results(model, X_test, y_test, custom_pred, sklearn_pred, img_name):
+    """
+    plots the predictions of our custom classifier versus
+    the ones from the sklean library, as well as the actual
+    y values
+    """
+    fig = plt.figure(figsize=(8,5))
+
+    pred = custom_pred.flatten()
+    tp, tn, fp, fn = [], [], [], []
+
+    for i in range(X_test.shape[0]):
+        if y_test[i] == 1: 
+            # Positive class
+            if pred[i] == 1:
+                tp.append((X_test[i,1], X_test[i,2])) # True positive
+            else:
+                fn.append((X_test[i,1], X_test[i,2])) # False negative
+        else:
+            # Negative class
+            if pred[i] == 1:
+                fp.append((X_test[i,1], X_test[i,2])) # False positive
+            else:
+                tn.append((X_test[i,1], X_test[i,2])) # True negative
+
+    # Convert the lists of tupples into numpy arrays for visualization
+    tp = np.array(tp, dtype='float')
+    tn = np.array(tn, dtype='float')
+    fp = np.array(fp, dtype='float')
+    fn = np.array(fn, dtype='float')
+
+    sns.scatterplot(x=tp[:,0], y=tp[:,1])
+    sns.scatterplot(x=fp[:,0], y=fp[:,1])
+    sns.scatterplot(x=tn[:,0], y=tn[:,1])
+    sns.scatterplot(x=fn[:,0], y=fn[:,1])
+
+    # Show probability threshold area
+    nx, ny = 200, 100
+    x_min, x_max = plt.xlim()
+    y_min, y_max = plt.ylim()
+    xx, yy = np.meshgrid(np.linspace(x_min, x_max, nx),
+                         np.linspace(y_min, y_max, ny))
+    Z = model.predict_proba(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z[:, 1].reshape(xx.shape)
+    plt.pcolormesh(xx, yy, Z, cmap='red_blue_classes', norm=colors.Normalize(0., 1.), zorder=0)
+    plt.contour(xx, yy, Z, [0.5], linewidths=2., colors='white')
+
+    fig.legend(labels=['True Positives', 'False Positives', 'True Negatives', 'False Negatives'], loc='upper left')
+    plt.title('Linear Discriminant Analysis')
+    plt.savefig("../img/models/%s" % img_name)
+    plt.close()
+    print("Created ../img/models/%s" % img_name)
+
+    
+
 def main():
 
     # Load & clean the data
