@@ -11,8 +11,9 @@ def evaluate_acc(ts_x, ts_y, model):
     x = ts_x
     y = ts_y
     predicted_y = model.predict(x)
-    err = (np.sum(abs(y - predicted_y)) / len(np.transpose(y)))
-    acc = (1 - err)
+    acc = float(sum(predicted_y == y))/float(len(y))
+    err = 1 - acc
+
 
     return err, acc
 
@@ -49,9 +50,6 @@ def model_selection(ev_x, ev_y, model, k=1):
             del(temp_y[i])
             x_tr = np.concatenate(temp_x)
             y_tr = np.concatenate(temp_y)
-            n, m = np.shape(x_tr)
-            ones = np.ones((n, 1))
-            np.append(ones, x_tr, axis=1)
             model.fit(x_tr, y_tr)
             err, acc = evaluate_acc(x_vl, y_vl, model)
             tot_err.append(err)
@@ -85,12 +83,26 @@ def main():
 
     np.seterr(over='ignore')
 
-    lr = logR.LogisticRegression(X_train, y_train, x_vars, y_var)
+    X_tr_lr = X_train
+    X_ts_lr = X_test
 
-    lr_avg_err, lr_avg_acc= model_selection(X_train, y_train, lr, 5)
+    n_tr, m_tr = np.shape(X_train)
+    X_tr_lr = np.hstack((np.ones((n_tr, 1)), X_tr_lr))
+    y_train = y_train.reshape(n_tr, 1)
+
+    n_ts, m_ts = np.shape(X_test)
+    X_ts_lr = np.hstack((np.ones((n_ts, 1)), X_ts_lr))
+
+
+    lr = logR.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=0.03, num_iters=2000, stopping_criteria=0.001)
+
+
+    lr_avg_err, lr_avg_acc = model_selection(X_tr_lr, y_train, lr, 5)
     print("Logistic Regression")
     print(lr_avg_err)
     print(lr_avg_acc)
+
+
 
     ld = lda.LDA(X_train, y_train)
     ld_avg_err, ld_avg_acc = model_selection(X_train, y_train, ld, 5)
