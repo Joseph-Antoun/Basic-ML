@@ -137,6 +137,55 @@ def train_test_split(df, x_vars, y_var, train_ratio=0.8, shuffle=True, random_se
 
     return X_train, X_test, y_train, y_test
 
+def compute_y_column_breast_cancer(clean_data):
+    """
+    Transform 'Class'[2,4] => 'y' [0,1]
+    Breast Cancer dataset only
+    """
+    # this is to skip SettingWithCopyWarning from Pandas
+    clean_df = clean_data.copy()
+    # Create the binary y column
+    clean_data['y'] = np.where(clean_df['Class'] == 4.0, 1.0, 0.0)
+    # Drop the 'quality' column
+    return clean_data.drop('Class', axis=1)
+
+
+def get_clean_data_breast_cancer(raw_data, delete_outliers=False, verbose=True):
+    """
+    Breast Cancer specific
+    Flag potential errors and delete them. 
+    Deleting outliers is optionnal
+    """
+
+    columns_to_clean = [c for c in raw_data.columns if c not in ['flag', 'Sample code number']]
+    # Drop rows containing missing values first
+    raw_data = raw_data.dropna()
+
+    # by default, flag everything as OK, this may change as problems are found
+    raw_data['flag'] = 'ok'
+   
+    # Test that all columns are made of float values
+    for column in columns_to_clean:
+        raw_data = flag_not_float(raw_data, column)
+    raw_data = raw_data[raw_data['flag'] != 'not a float']
+    for column in columns_to_clean:
+        raw_data[column] = pd.to_numeric(raw_data[column],errors='coerce')
+
+    # Flag potential outliers
+    raw_data = flag_outliers(raw_data, columns_to_clean)
+
+    # Flag duplicated data if any
+    raw_data = flag_duplicates(raw_data)
+
+    # Then clean the data
+    if delete_outliers is True:
+        clean_data = raw_data[raw_data['flag']=='ok']
+    else:
+        clean_data = raw_data[(raw_data['flag']=='ok') | (raw_data['flag']=='potential outlier')]
+
+    # Drop the flag column before returning the clean data
+    return clean_data.drop('flag', axis=1)
+
 
 def compute_y_column_wine(clean_data):
     """
