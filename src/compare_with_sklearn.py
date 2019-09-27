@@ -13,18 +13,6 @@ import LDA as Custom_LDA
 
 
 
-def compute_y_column_wine(clean_data):
-    """
-    Transform 'quality'[0,1,...,10] => 'y' [0,1]
-    Wine dataset only
-    """
-    # this is to skip SettingWithCopyWarning from Pandas
-    clean_df = clean_data.copy()
-    # Create the binary y column
-    clean_df['y'] = np.where(clean_data['quality'] >= 6.0, 1.0, 0.0)
-    # Drop the 'quality' column
-    return clean_df.drop('quality', axis=1)
-
         
 
 def main():
@@ -33,7 +21,7 @@ def main():
     file_path   = '../data/wine/winequality-red.csv'
     raw_data    = pd.read_csv(file_path, delimiter=';')
     clean_data  = data_cleaning.get_clean_data(raw_data, verbose=False)
-    clean_data  = compute_y_column_wine(clean_data)
+    clean_data  = data_cleaning.compute_y_column_wine(clean_data)
 
     # Split between X and y and create the numpy arrays
     x_vars = clean_data.columns.tolist()
@@ -63,12 +51,6 @@ def main():
     custom_lda = Custom_LDA.LDA(X_train, y_train)
     custom_lda.fit(X_train, y_train)
     custom_pred = custom_lda.predict(X_test)
-
-    data_visualization.plot_predictions_results(
-            sklearn_lda,
-            X_test, y_test, 
-            custom_pred, sklearn_pred, 
-            "lda_predictions.png")    
 
 
 
