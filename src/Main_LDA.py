@@ -105,8 +105,12 @@ def main():
     ld = lda.LDA(X_train, y_train)
     ld_avg_err, ld_avg_acc = model_selection(X_train, y_train, ld, 5)
     print("LDA")
-    print(ld_avg_err)
-    print(ld_avg_acc)
+    print("Average Error with K-fold: ", ld_avg_err)
+    print("Average Accuracy with K-fold: ", ld_avg_acc)
+
+    ts_avg_err, ts_avg_acc = evaluate_acc(X_test, y_test, ld)
+    print("Average Test Error: ", ts_avg_err)
+    print("Average Test Accuracy: ", ts_avg_acc)
 
     print("Time lapsed = ", datetime.now() - start_time)
 
