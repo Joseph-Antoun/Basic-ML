@@ -1,13 +1,14 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
-import data_cleaning
 
 
 class LDA:
 
     def __init__(self, X, y):
+        """
+        This is the constructor for LDA class
+        :param X: Features Data
+        :param y: Classification Data
+        """
         self.X = X
         self.y = y
         self.n, self.m = np.shape(X)
@@ -16,6 +17,11 @@ class LDA:
         self.w_1 = np.ones((self.m, 1))
 
     def fit(self, X, y):
+        """
+        This method is used to fir the model for LDA
+        :param X: Training feature data
+        :param y: Training classification data
+        """
         n, m = np.shape(X)
 
         tr_x = X
@@ -47,6 +53,11 @@ class LDA:
         self.w_1 = w_1
 
     def predict(self, d_x):
+        """
+        This method is used to predict the classification of the given features
+        :param d_x: the decision boundary for the model
+        :return: the predicted data
+        """
         w_0 = self.w_0
         w_1 = self.w_1
 
@@ -59,13 +70,5 @@ class LDA:
 
         return d
 
-    # def evaluate_acc(self, ev_x, ev_y):
-    #     x = ev_x
-    #     y = ev_y
-    #     predicted_y = self.predict(x)
-    #
-    #     acc = (1 - (np.sum(abs(y - predicted_y)) / len(np.transpose(y)))) * 100
-    #
-    #     return acc
 
 

@@ -8,6 +8,13 @@ import LDA as lda
 
 
 def evaluate_acc(ts_x, ts_y, model):
+    """
+    This method is used to evaluate the accuracy and error of the trained model.
+    :param ts_x: features data to test/ evaluate our model
+    :param ts_y: the real classification of the test data
+    :param model: the model under evaluation
+    :return: acc: accuracy of the model, err: the error of the model
+    """
     x = ts_x
     y = ts_y
     predicted_y = model.predict(x)
@@ -19,6 +26,15 @@ def evaluate_acc(ts_x, ts_y, model):
 
 
 def model_selection(ev_x, ev_y, model, k=1):
+    """
+    This method is used for model selection, it applies K-Fold cross validation.
+    :param ev_x: The features data used to train
+    :param ev_y: the classification data used to train
+    :param model: The model that need to apply the k-fold for
+    :param k: the number of folds, if k=1 it will train and validate on the same data
+    :param costs: the list that will hold the cost function results for each fold.
+    :return: return the average error and accuracy of the model with k-fold
+    """
     tot_err = []
     tot_acc = []
     # avg_err = 0.0

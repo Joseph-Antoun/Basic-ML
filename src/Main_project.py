@@ -7,9 +7,17 @@ import seaborn as sns
 
 import data_cleaning as dc
 import Pr1 as logR
+import LogisticRegression as logR2
 
 
 def evaluate_acc(ts_x, ts_y, model):
+    """
+    This method is used to evaluate the accuracy and error of the trained model.
+    :param ts_x: features data to test/ evaluate our model
+    :param ts_y: the real classification of the test data
+    :param model: the model under evaluation
+    :return: acc: accuracy of the model, err: the error of the model
+    """
     x = ts_x
     y = ts_y
     predicted_y = model.predict(x)
@@ -21,6 +29,15 @@ def evaluate_acc(ts_x, ts_y, model):
 
 
 def model_selection(ev_x, ev_y, model, k=1, costs=[]):
+    """
+    This method is used for model selection, it applies K-Fold cross validation.
+    :param ev_x: The features data used to train
+    :param ev_y: the classification data used to train
+    :param model: The model that need to apply the k-fold for
+    :param k: the number of folds, if k=1 it will train and validate on the same data
+    :param costs: the list that will hold the cost function results for each fold.
+    :return: return the average error and accuracy of the model with k-fold
+    """
     tot_err = []
     tot_acc = []
 
@@ -56,7 +73,6 @@ def model_selection(ev_x, ev_y, model, k=1, costs=[]):
 
     avg_err = sum(tot_err)/len(tot_err)
     avg_acc = sum(tot_acc)/len(tot_acc)
-
 
     return avg_err, avg_acc
 
@@ -97,25 +113,45 @@ def main():
 
 
 
-    lr = logR.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=0.08, num_iters=1500, stopping_criteria=0.2)
-
+    lr = logR.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=0.0023, num_iters=1500,
+                                 stopping_criteria=1e-15)
+    lr2 = logR2.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=0.001, reg_val=0.001, num_iters=1000,
+                                   stopping_criteria=1e-20)
     cost_fcs = []
+    cost_fcs2 = []
 
     lr_avg_err, lr_avg_acc = model_selection(X_tr_lr, y_train, lr, 5, cost_fcs)
     print("Logistic Regression")
     print(lr_avg_err)
     print(lr_avg_acc)
 
-    # plt.figure()
-    # sns.set_style('white')
-    # plt.plot(range(len(cost_fcs[0])), cost_fcs[4])
-    # plt.title("Convergence Graph of Cost Function")
-    # plt.xlabel("Number of Iterations")
-    # plt.ylabel("Cost")
-    # plt.show()
+    err, acc = evaluate_acc(X_ts_lr, y_test, lr)
+    print(err)
+    print(acc)
+
+    lr_avg_err2, lr_avg_acc2 = model_selection(X_tr_lr, y_train, lr2, 5, cost_fcs2)
+    print("Logistic Regression2")
+    print(lr_avg_err2)
+    print(lr_avg_acc2)
 
 
     print("Time lapsed = ", datetime.now() - start_time)
+    plt.figure(1)
+    sns.set_style('white')
+    plt.plot(range(len(cost_fcs[0])), cost_fcs[0])
+    plt.title("Convergence Graph of Cost Function")
+    plt.xlabel("Number of Iterations")
+    plt.ylabel("Cost")
+    plt.figure(2)
+    sns.set_style('white')
+    plt.plot(range(len(cost_fcs2[0])), cost_fcs2[0])
+    plt.title("Convergence Graph of Cost Function2")
+    plt.xlabel("Number of Iterations")
+    plt.ylabel("Cost")
+    plt.show()
+
+
+
 
 
 if __name__ == "__main__":
