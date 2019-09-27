@@ -138,6 +138,19 @@ def train_test_split(df, x_vars, y_var, train_ratio=0.8, shuffle=True, random_se
     return X_train, X_test, y_train, y_test
 
 
+def compute_y_column_wine(clean_data):
+    """
+    Transform 'quality'[0,1,...,10] => 'y' [0,1]
+    Wine dataset only
+    """
+    # this is to skip SettingWithCopyWarning from Pandas
+    clean_df = clean_data.copy()
+    # Create the binary y column
+    clean_df['y'] = np.where(clean_data['quality'] >= 6.0, 1.0, 0.0)
+    # Drop the 'quality' column
+    return clean_df.drop('quality', axis=1)
+
+
 
 def main():
     
