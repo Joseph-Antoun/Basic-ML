@@ -110,7 +110,7 @@ def main():
 
     ts_avg_err, ts_avg_acc = evaluate_acc(X_test, y_test, ld)
     print("Average Test Error: ", ts_avg_err)
-    print("Average Test Accuracy: ", ts_avg_acc)
+    print("Average Test Accuracy  : ", ts_avg_acc)
 
     print("Time lapsed = ", datetime.now() - start_time)
 

@@ -122,18 +122,21 @@ def main():
 
     lr_avg_err, lr_avg_acc = model_selection(X_tr_lr, y_train, lr, 5, cost_fcs)
     print("Logistic Regression")
-    print(lr_avg_err)
-    print(lr_avg_acc)
+    print("Average Error on validation: ", lr_avg_err)
+    print("Average Accuracy on validation: ", lr_avg_acc)
 
     err, acc = evaluate_acc(X_ts_lr, y_test, lr)
-    print(err)
-    print(acc)
+    print("Average Test Error: ", err)
+    print("Average Test Error: ", acc)
 
     lr_avg_err2, lr_avg_acc2 = model_selection(X_tr_lr, y_train, lr2, 5, cost_fcs2)
     print("Logistic Regression2")
-    print(lr_avg_err2)
-    print(lr_avg_acc2)
+    print("Average Error on validation with regularization: ", lr_avg_err2)
+    print("Average accuracy on validation with regularization: ", lr_avg_acc2)
 
+    err2, acc2 = evaluate_acc(X_ts_lr, y_test, lr2)
+    print("Average Test Error with regularization: ", err2)
+    print("Average Test Error with regularization: ", acc2)
 
     print("Time lapsed = ", datetime.now() - start_time)
     plt.figure(1)
