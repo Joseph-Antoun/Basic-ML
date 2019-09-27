@@ -1,12 +1,10 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 
 import data_cleaning as dc
-import Pr1 as logR
+import LDA as lda
+
 
 
 def evaluate_acc(ts_x, ts_y, model):
@@ -20,9 +18,11 @@ def evaluate_acc(ts_x, ts_y, model):
     return err, acc
 
 
-def model_selection(ev_x, ev_y, model, k=1, costs=[]):
+def model_selection(ev_x, ev_y, model, k=1):
     tot_err = []
     tot_acc = []
+    # avg_err = 0.0
+    # avg_acc = 0.0
 
     if k == 1:
         n, m = np.shape(ev_x)
@@ -33,7 +33,6 @@ def model_selection(ev_x, ev_y, model, k=1, costs=[]):
         err, acc = evaluate_acc(tr_x, tr_y, model)
         tot_err.append(err)
         tot_acc.append(acc)
-        costs.append(model.h_cost)
 
     elif k > 1:
         x = np.array_split(ev_x, k)
@@ -52,11 +51,9 @@ def model_selection(ev_x, ev_y, model, k=1, costs=[]):
             err, acc = evaluate_acc(x_vl, y_vl, model)
             tot_err.append(err)
             tot_acc.append(acc)
-            costs.append(model.h_cost)
 
     avg_err = sum(tot_err)/len(tot_err)
     avg_acc = sum(tot_acc)/len(tot_acc)
-
 
     return avg_err, avg_acc
 
@@ -83,37 +80,17 @@ def main():
 
     np.seterr(over='ignore')
 
-    X_tr_lr = X_train
-    X_ts_lr = X_test
-
     n_tr, m_tr = np.shape(X_train)
     n_ts, m_ts = np.shape(X_test)
-
-    X_tr_lr = np.hstack((np.ones((n_tr, 1)), X_tr_lr))
-    X_ts_lr = np.hstack((np.ones((n_ts, 1)), X_ts_lr))
 
     y_train = y_train.reshape(n_tr, 1)
     y_test = y_test.reshape(n_ts, 1)
 
-
-
-    lr = logR.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=0.08, num_iters=1500, stopping_criteria=0.2)
-
-    cost_fcs = []
-
-    lr_avg_err, lr_avg_acc = model_selection(X_tr_lr, y_train, lr, 5, cost_fcs)
-    print("Logistic Regression")
-    print(lr_avg_err)
-    print(lr_avg_acc)
-
-    # plt.figure()
-    # sns.set_style('white')
-    # plt.plot(range(len(cost_fcs[0])), cost_fcs[4])
-    # plt.title("Convergence Graph of Cost Function")
-    # plt.xlabel("Number of Iterations")
-    # plt.ylabel("Cost")
-    # plt.show()
-
+    ld = lda.LDA(X_train, y_train)
+    ld_avg_err, ld_avg_acc = model_selection(X_train, y_train, ld, 5)
+    print("LDA")
+    print(ld_avg_err)
+    print(ld_avg_acc)
 
     print("Time lapsed = ", datetime.now() - start_time)
 
