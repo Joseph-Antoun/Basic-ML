@@ -75,8 +75,6 @@ def model_selection(ev_x, ev_y, model, k=1):
 
 
 def main():
-    start_time = datetime.now()
-
     file_path = '../data/breast-cancer-wisconsin/breast-cancer-wisconsin.data'
     header = ['Sample code number', 'Clump Thickness', 'Uniformity of Cell Size',
               'Uniformity of Cell Shape', 'Marginal Adhesion', 'Single Epithelial Cell Size',
@@ -106,8 +104,11 @@ def main():
     y_train = y_train.reshape(n_tr, 1)
     y_test = y_test.reshape(n_ts, 1)
 
+    start_time = datetime.now()
+
     ld = lda.LDA(X_train, y_train)
-    ld_avg_err, ld_avg_acc = model_selection(X_train, y_train, ld, 5)
+    ld_avg_err, ld_avg_acc = model_selection(X_train, y_train, ld, 1)
+    print("Time lapsed = ", datetime.now() - start_time)
     print("LDA")
     print("Average Error with K-fold: ", ld_avg_err)
     print("Average Accuracy with K-fold: ", ld_avg_acc)
@@ -116,7 +117,7 @@ def main():
     print("Average Test Error: ", ts_avg_err)
     print("Average Test Accuracy  : ", ts_avg_acc)
 
-    print("Time lapsed = ", datetime.now() - start_time)
+
 
 
 if __name__ == "__main__":

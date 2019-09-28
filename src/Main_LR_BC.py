@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -77,8 +78,24 @@ def model_selection(ev_x, ev_y, model, k=1, costs=[]):
     return avg_err, avg_acc
 
 
+def plot_cost_func(cost_fnc):
+    plt.figure()
+    sns.set_style('white')
+
+    plt.plot(range(len(cost_fnc[0])), cost_fnc[0], label="\u03B1 = 740e-14, \u03BB =800e-14")
+    plt.plot(range(len(cost_fnc[1])), cost_fnc[1], label="\u03B1 = 743e-14, \u03BB =800e-14")
+    plt.plot(range(len(cost_fnc[2])), cost_fnc[2], label="\u03B1 = 746e-14, \u03BB =800e-14")
+    plt.plot(range(len(cost_fnc[3])), cost_fnc[3], label="\u03B1 = 749e-14, \u03BB =800e-14")
+    plt.plot(range(len(cost_fnc[4])), cost_fnc[4], label="\u03B1 = 751e-14, \u03BB =800e-14")
+    plt.title("Convergence Graph of Cost Function")
+    plt.xlabel("Number of Iterations")
+    plt.ylabel("Cost")
+    plt.legend()
+    plt.show()
+
+
 def main():
-    start_time = datetime.now()
+
 
     file_path = '../data/breast-cancer-wisconsin/breast-cancer-wisconsin.data'
     header = ['Sample code number', 'Clump Thickness', 'Uniformity of Cell Size',
@@ -115,50 +132,50 @@ def main():
     y_train = y_train.reshape(n_tr, 1)
     y_test = y_test.reshape(n_ts, 1)
 
-
-
-    lr = logR.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=74e-13, num_iters=50,
-                                 stopping_criteria=1e-8)
-    lr2 = logR2.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=75e-13, reg_val=75e-13, num_iters=100,
-                                   stopping_criteria=1e-20)
     cost_fcs = []
-    cost_fcs2 = []
+    start_time = datetime.now()
+    lr1 = logR2.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=740e-14, reg_val=0, num_iters=50,
+                                   stopping_criteria=1e-12)
+    # lr2 = logR2.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=743e-14, reg_val=800e-14, num_iters=50,
+    #                                stopping_criteria=1e-12)
+    # lr3 = logR2.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=746e-14, reg_val=800e-14, num_iters=50,
+    #                                stopping_criteria=1e-12)
+    # lr4 = logR2.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=749e-14, reg_val=800e-14, num_iters=50,
+    #                                stopping_criteria=1e-12)
+    # lr5 = logR2.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=751e-14, reg_val=800e-14, num_iters=50,
+    #                                stopping_criteria=1e-12)
+    # lr2 = logR2.LogisticRegression(X_tr_lr, y_train, x_vars, y_var, alpha=71e-13, reg_val=69e-13, num_iters=40,
+    #                                stopping_criteria=1e-20)
 
-    lr_avg_err, lr_avg_acc = model_selection(X_tr_lr, y_train, lr, 5, cost_fcs)
+
+
+
+    lr_avg_err, lr_avg_acc = model_selection(X_tr_lr, y_train, lr1, 1, cost_fcs)
+    # lr_avg_err, lr_avg_acc = model_selection(X_tr_lr, y_train, lr2, 1, cost_fcs)
+    # lr_avg_err, lr_avg_acc = model_selection(X_tr_lr, y_train, lr3, 1, cost_fcs)
+    # lr_avg_err, lr_avg_acc = model_selection(X_tr_lr, y_train, lr4, 1, cost_fcs)
+    # lr_avg_err, lr_avg_acc = model_selection(X_tr_lr, y_train, lr5, 1, cost_fcs)
+
+    # plot_cost_func(cost_fcs)
+    print("Time lapsed = ", datetime.now() - start_time)
     print("Logistic Regression")
     print("Average Error on validation: ", lr_avg_err)
     print("Average Accuracy on validation: ", lr_avg_acc)
 
-    err, acc = evaluate_acc(X_ts_lr, y_test, lr)
+    err, acc = evaluate_acc(X_ts_lr, y_test, lr1)
     print("Average Test Error: ", err)
-    print("Average Test Error: ", acc)
+    print("Average Test accuracy: ", acc)
 
-    lr_avg_err2, lr_avg_acc2 = model_selection(X_tr_lr, y_train, lr2, 5, cost_fcs2)
-    print("Logistic Regression2")
-    print("Average Error on validation with regularization: ", lr_avg_err2)
-    print("Average accuracy on validation with regularization: ", lr_avg_acc2)
+    # lr_avg_err2, lr_avg_acc2 = model_selection(X_tr_lr, y_train, lr2, 5, cost_fcs2)
+    # print("Logistic Regression2")
+    # print("Average Error on validation with regularization: ", lr_avg_err2)
+    # print("Average accuracy on validation with regularization: ", lr_avg_acc2)
 
-    err2, acc2 = evaluate_acc(X_ts_lr, y_test, lr2)
-    print("Average Test Error with regularization: ", err2)
-    print("Average Test Error with regularization: ", acc2)
+    # err2, acc2 = evaluate_acc(X_ts_lr, y_test, lr2)
+    # print("Average Test Error with regularization: ", err2)
+    # print("Average Test Error with regularization: ", acc2)
 
-    print("Time lapsed = ", datetime.now() - start_time)
-    plt.figure(1)
-    sns.set_style('white')
-    plt.plot(range(len(cost_fcs[0])), cost_fcs[0])
-    plt.title("Convergence Graph of Cost Function")
-    plt.xlabel("Number of Iterations")
-    plt.ylabel("Cost")
-    plt.figure(2)
-    sns.set_style('white')
-    plt.plot(range(len(cost_fcs2[0])), cost_fcs2[0])
-    plt.title("Convergence Graph of Cost Function2")
-    plt.xlabel("Number of Iterations")
-    plt.ylabel("Cost")
-    plt.show()
-
-
-
+    # print("Time lapsed = ", datetime.now() - start_time)
 
 
 if __name__ == "__main__":

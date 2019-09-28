@@ -83,7 +83,7 @@ class LogisticRegression:
                 stop = np.amax(ar_stop)
             w_init = w
             if stop < epsilon:
-                print("threshold reached1.\n")
+                print("threshold reached.\n")
                 break
 
 
